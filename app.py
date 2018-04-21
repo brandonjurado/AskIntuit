@@ -22,7 +22,7 @@ ask = Ask(app, '/')
 # Query intuit 
 def searchIntuit(query):
     search_term_string = query
-    search_term_string = "how to file taxes on a roth ira"
+    
     r = requests.get(
         "https://accountants-community.intuit.com/search?utf8=%E2%9C%93&q="+search_term_string)
     data = r.text
@@ -70,7 +70,7 @@ def searchIntuit(query):
 @ask.launch
 def start_skill():
     welcome_message = "Hello there, I can answer questions using intuit knowledge base. Ask away"
-    return question(welcome_message)
+    return statement(welcome_message)
 
 @ask.intent("HelloIntent")
 def hello():
@@ -79,8 +79,17 @@ def hello():
 
 @ask.intent("fileRoth")
 def fileRothFunction():
-    questionArr, answerArr = searchIntuit("how to file a roth IRA")
-    return statement(answerArr[0])
+    questionArr1, answerArr1 = searchIntuit("how to file a roth ira")
+    return statement("You've activated fileRoth Intent" + answerArr1[0])
+
+@ask.intent("QueryKnowledgebase")
+def getAnswer(query):
+    questionArr2, answerArr2=searchIntuit(query)
+    return statement("you've activated QueryKnowledgebase" + answerArr2[0])
+    
+
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+    
