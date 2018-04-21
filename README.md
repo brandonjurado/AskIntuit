@@ -1,2 +1,2 @@
-# IntuitAsk
-An Alexa skill built for answer questions directed towards Intuit 
+# AskIntuit
+An Alexa skill built to answer questions directed towards Intuit 
