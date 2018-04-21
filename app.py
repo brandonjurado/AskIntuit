@@ -4,6 +4,9 @@ from flask_ask import Ask, statement
 app = Flask(__name__)
 ask = Ask(app, '/')
 
+# Load the views
+import views
+
 @ask.intent('HelloIntent')
 def hello(firstname):
     text = render_template('hello', firstname=firstname)
