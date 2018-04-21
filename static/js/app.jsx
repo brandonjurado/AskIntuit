@@ -10,6 +10,16 @@ class App extends  React.Component {
               {
                 id: '0',
                 message: 'Hi, you can ask me your sexy tax questions!',
+                trigger: '1'
+              },
+              {
+                id: '1',
+                user: true,
+                trigger: '2',
+              },
+              {
+                id: '2',
+                message: 'Your answer!',
                 trigger: '1',
               }
         ];
