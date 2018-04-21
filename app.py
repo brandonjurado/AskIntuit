@@ -6,8 +6,8 @@ ask = Ask(app, '/')
 
 @ask.intent('HelloIntent')
 def hello(firstname):
-    text = render_template('hello', firstname=firstname)
-    return statement(text).simple_card('Hello', text)
+    welcome_message = "Hi, your app is working"
+    return statement(welcome_message)
 
 if __name__ == '__main__':
     app.run(debug=True)
