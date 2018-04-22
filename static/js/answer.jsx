@@ -18,8 +18,9 @@ class Answer extends React.Component {
 
   componentWillMount() {
       const values = this.props.valueCallback();
-      console.log(values)
-      axios.get('/query/'+  values.question)
+       console.log(values)
+       values.index = values.steps["5"].options[1].value;
+       axios.get('/query/'+  values.question)
           .then((response) => {
             console.log(response);
             this.setState({ loading: false, 
@@ -32,6 +33,10 @@ class Answer extends React.Component {
             this.setState({ loading: false, 
               questions: undefined, answers: undefined });
           });
+  }
+
+  componentWillUnMount() {
+    window.answer_component_mounted = false;
   }
 
   triggetNext() {

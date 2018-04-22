@@ -21,13 +21,15 @@ class App extends  React.Component {
         // all available props
         this.theme = {
             userBubbleColor: '#fff',
-                userFontColor: '#4a4a4a',
+            userFontColor: '#4a4a4a',
         };
 
         this.getQueryValues = () => {
+            console.log("get query value called!");
             return {
+                steps: this.initialSteps,
                 question: this.state.currentQuestion,
-                index: this.state.currentIndex++
+                index: this.state.currentIndex
             }
         };
 
@@ -44,8 +46,8 @@ class App extends  React.Component {
                 validator: (value) => {
                     console.log("Setting state.", value);
                     this.setState({
-                        currentQuestion: value,
-                        currentIndex: 0
+                        currentQuestion: (value === "No") ? this.state.currentQuestion : value ,
+                        currentIndex: (value === "No") ? this.state.currentIndex : 0,
                     });
                     return true;
                 }
@@ -68,8 +70,8 @@ class App extends  React.Component {
               {
                 id: '5',
                 options: [
-                    { value: 1, label: 'Yes', trigger: '1', },
-                    { value: 2, label: 'No', trigger: '3' },
+                    { value: 1, label: 'Yes', trigger: '1' },
+                    { value: this.getQueryValues().index++ , label: 'No', trigger: '3' },
                 ]
               }
         ];
@@ -99,7 +101,7 @@ class App extends  React.Component {
                         <i className="devicon-python-plain-wordmark"></i>
                     </div>
                 </div>
-                    <ChatBot className="chatbot-ui" steps={this.initialSteps} />
+                    <ChatBot className="chatbot-ui" headerTitle="Lets talk!" steps={this.initialSteps} />
             </div>
         );
     }

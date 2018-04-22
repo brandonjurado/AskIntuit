@@ -67,7 +67,7 @@ class QueryEngine(Resource):
         import re
         from collections import OrderedDict
 
-        search_term_string = "how to file taxes on a roth ira"
+        search_term_string = "how do I file 401k"
         page = requests.get(
           "https://accountants-community.intuit.com/search?filters%5Bcountry%5D=US&filters%5Bdocument_type%5D=Question&filters%5Bstate%5D=Recommended&q=" + search_term_string)
         soup = BeautifulSoup(page.content, 'html.parser')
@@ -91,10 +91,14 @@ class QueryEngine(Resource):
           question_array.append(result.text)
           table = soup.findAll('div', attrs={"class": "my-1"})
           for x in table:
-            answers = x.find('p').text
-            answer_array.append(answers)
-        print(question_array)
-        print(answer_array)
+              text = list(x.children)
+              answer = []
+              for ans in text:
+                  if (ans.string != None and ans.string.strip()):
+                      answer.append(ans.string)
+              answer_array.append(' '.join(answer))
+        print(question_array[0])
+        print(answer_array[0])
         return {'questions':question_array, 'answers':answer_array}
 
 restApi.add_resource(QueryEngine, '/query/<string:question>')
