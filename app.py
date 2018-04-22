@@ -5,12 +5,13 @@ from collections import OrderedDict
 from flask_ask import Ask, statement, question, session
 from flask import Flask, render_template
 from flask_ask import Ask, statement
-
+from twilio.rest import Client
+from urllib.request import urlopen
+import boto3
+import re
 
 app = Flask(__name__)
 ask = Ask(app, '/')
-
-
 
 # Query intuit
 def searchIntuit(query):
@@ -31,7 +32,9 @@ def searchIntuit(query):
     final_indexes = list(OrderedDict.fromkeys(final_indexes))
     answer_array = []
     question_array = []
+    cutOffIndex = 0
     for i in final_indexes:
+        cutOffIndex += 1
         rr = requests.get("https://accountants-community.intuit.com/questions/" + i)
         soup = BeautifulSoup(rr.content, 'html.parser')
         result = soup.find("h1")
@@ -44,44 +47,105 @@ def searchIntuit(query):
                 if (ans.string != None and ans.string.strip()):
                     answer.append(ans.string)
             answer_array.append(' '.join(answer))
-    return question_array, answer_array
-
-index = 0
-temp = 0
+        if cutOffIndex == 3:
+            return question_array, answer_array
 
 @ask.intent("QueryKnowledgebase")
 def getAnswer(query):
+    isBroke = False
+    triggerWords = ["broken", "not working", "broke", "isn't working"]
+    for i in triggerWords:
+        x = 0
+        if i in query:
+            isBroke = True
+            account_sid = "AC5250b6f6b34be7f37a0a9c188bdcea1e"
+            auth_token = "0a413933672df9a739527e5259d25997"
+            client = Client(account_sid, auth_token)
+            client.api.account.messages.create(
+            to="+12545772767",
+            from_="+12548314738",
+            body="User has sent message: {} Check application and functionality".format(query))
+            with urlopen("https://s3-us-west-2.amazonaws.com/one-int/alerts.txt") as url:
+                s = url.read()
+            string1 = str(s)
+            x = int(re.search(r'\d+', string1).group())
+            x += 1
+            binary = str(x).encode()
+            s3 = boto3.resource('s3')
+            object = s3.Object('one-int', 'alerts.txt')
+            object.put(Body=binary)
+            boto3.resource('s3').ObjectAcl('one-int','alerts.txt').put(ACL='public-read')
+        if x > 2:
+            account_sid = "ACf4b4c4a21347b9fce0358f0f6ebac107"
+            auth_token = "3fba63cfcd3d1f38ef6d7f1f98cbb01e"
+            client = Client(account_sid, auth_token)
+            client.api.account.messages.create(
+            to="+18176532661",
+            from_="+14694163460",
+            body="An unusually high number of people are experiencing application issues, check the logs")
+            x = 0
+            binary = str(x).encode()
+            s3 = boto3.resource('s3')
+            object = s3.Object('one-int', 'alerts.txt')
+            object.put(Body=binary)
+            boto3.resource('s3').ObjectAcl('one-int','alerts.txt').put(ACL='public-read')
+        break
+    if isBroke:
+        return statement("I noticed that you have reported that something isn't working correctly, we will forward this to our team and be in touch with a solution, thank you.")
+        
+    session.attributes["noCounter"] = 0
     session.attributes["index"]=0
     index=session.attributes["index"]
     session.attributes["currentQuery"] = query
     session.attributes["questionArr2"], session.attributes["answerArr2"] = searchIntuit(query)
     questionArr2, answerArr2= session.attributes["questionArr2"], session.attributes["answerArr2"]
-    return question("I have found " + questionArr2[index] + "Does this match your search term?")
+    return question("I have found..." + questionArr2[index] + "...Does this match your search term?")
 
 
 @ask.intent('AMAZON.YesIntent')
 def yes_intent():
-    query = session.attributes["currentQuery"]      
-    session.attributes["questionArr2"], session.attributes["answerArr2"] = searchIntuit(query) 
-    questionArr2, answerArr2= session.attributes["questionArr2"], session.attributes["answerArr2"]  
-    temp=session.attributes["index"]
-    session.attributes["index"] = 0
-    return statement(answerArr2[temp])
+    if session.attributes["noCounter"] == 3:
+        return statement("Please let me know more about your issue or question and I will pass it on, thank you.")
+    else:
+        query = session.attributes["currentQuery"] 
+        session.attributes["noCounter"] = 0     
+        questionArr2, answerArr2= session.attributes["questionArr2"], session.attributes["answerArr2"]  
+        temp=session.attributes["index"]
+        session.attributes["index"] = 0
+        message = ''
+        if len(answerArr2[temp].split()) > 35:
+            message = "The message is pretty lengthy, I will text it to you instead"
+            account_sid = "AC5250b6f6b34be7f37a0a9c188bdcea1e"
+            auth_token = "0a413933672df9a739527e5259d25997"
+            client = Client(account_sid, auth_token)
+            client.api.account.messages.create(
+            to="+12545772767",
+            from_="+12548314738",
+            body=answerArr2[temp])
+        else:
+            message = answerArr2[temp]
+        return statement(message)
 
 @ask.intent('AMAZON.NoIntent')
-def no_intent():    
-    query = session.attributes["currentQuery"]
-    session.attributes["questionArr2"], session.attributes["answerArr2"] = searchIntuit(query) 
-    questionArr2, answerArr2= session.attributes["questionArr2"], session.attributes["answerArr2"]    
-    session.attributes["index"]+=1
-    index = session.attributes["index"]
-    return question("I have found " + questionArr2[index] + "Does this match your search term?")
+def no_intent():
+    if session.attributes["noCounter"] == 3:
+        return statement("I'm sorry we couldn't match your search. Thank you.")
+    else:
+        query = session.attributes["currentQuery"]
+        questionArr2, answerArr2= session.attributes["questionArr2"], session.attributes["answerArr2"]    
+        session.attributes["index"]+=1
+        session.attributes["noCounter"]+=1
+        index = session.attributes["index"]
+        if session.attributes["noCounter"] == 3:
+            return question("We don't seem to be finding what you want, I will submit this question to the knowledge base for you.  Would you like to provide more details to your quesiton?")
+        else:
+            return question("I have found..." + questionArr2[index] + "...Does this match your search term?")
 
 # ALEXA STUFF
 @ask.launch
 def start_skill():
     welcome_message = "Hello there, I can answer questions using intuit knowledge base. Ask away"
-    return statement(welcome_message)
+    return question(welcome_message)
 # Tell me hi
 @ask.intent("HelloIntent")
 def hello():
@@ -116,6 +180,7 @@ def demoMileageWriteOff():
 def demoNonJerseyTaxReturn():
     message = "On Paper. Use NJ-1040NR and write AMENDED on the top. FYI-this info is in the NJ-1040NR instructions"
     return statement(message)
+
 
 
 if __name__ == '__main__':
