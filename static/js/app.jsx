@@ -4,6 +4,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import ChatBot from 'react-simple-chatbot';
 import Answer from './answer.jsx';
+import { ThemeProvider } from 'styled-components';
+
 
 class App extends  React.Component {
     constructor(){
@@ -16,6 +18,11 @@ class App extends  React.Component {
             answers: []
         };
 
+        // all available props
+        this.theme = {
+            userBubbleColor: '#fff',
+                userFontColor: '#4a4a4a',
+        };
 
         this.getQueryValues = () => {
             return {
@@ -66,12 +73,27 @@ class App extends  React.Component {
                 ]
               }
         ];
+
     }
+    
 
     render() {
         return( 
             <div className="app-view">
-                <ChatBot steps={this.initialSteps} />
+                <div className="page">
+                    <h1 className="app-header">AskIntuit!</h1>
+                    <p className="pageInfo">
+                        Ask Intuit questions related to tax and tax documents. 
+                    </p>
+                    <p className="pageInfo">
+                        Get skills for alexa.
+                        <br />
+                        <img src="static/js/alexa_logo.svg" />
+                    </p>
+                    <div className="about-footer">
+                    </div>
+                </div>
+                    <ChatBot className="chatbot-ui" steps={this.initialSteps} />
             </div>
         );
     }
