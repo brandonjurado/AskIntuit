@@ -91,6 +91,12 @@ class App extends  React.Component {
                         <img src="static/js/alexa_logo.svg" />
                     </p>
                     <div className="about-footer">
+                        <img className="intuit-logo" src="static/js/intuit_logo.svg" />
+                        <i className="devicon-amazonwebservices-plain-wordmark"></i>
+                        <i className="devicon-react-original-wordmark"></i> 
+                        <i className="devicon-webpack-plain-wordmark"></i>
+                        <i className="devicon-babel-plain"></i>
+                        <i className="devicon-python-plain-wordmark"></i>
                     </div>
                 </div>
                     <ChatBot className="chatbot-ui" steps={this.initialSteps} />
