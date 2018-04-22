@@ -16,10 +16,10 @@ class Answer extends React.Component {
     this.triggetNext = this.triggetNext.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
       const values = this.props.valueCallback();
-       console.log(values)
-       values.index = values.steps["5"].options[1].value;
+      console.log(values)
+
        axios.get('/query/'+  values.question)
           .then((response) => {
             console.log(response);
@@ -35,11 +35,12 @@ class Answer extends React.Component {
           });
   }
 
-  componentWillUnMount() {
-    window.answer_component_mounted = false;
-  }
+  // componentWillUnMount() {
+  //   window.answer_component_mounted = false;
+  // }
 
   triggetNext() {
+    console.log("triggering next step.")
     this.setState({ trigger: true }, () => {
       this.props.triggerNextStep();
     });
@@ -75,7 +76,7 @@ Answer.propTypes = {
 Answer.defaultProps = {
   query: '',
   steps: undefined,
-  triggerNextStep: undefined,
+  triggerNextStep: () => {console.log("triggerNextStep")},
 };
 
 export default Answer;

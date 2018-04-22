@@ -13,7 +13,7 @@ class App extends  React.Component {
         
         this.state = {
             currentQuestion: '',
-            currentIndex: 0,
+            currentIndex: -1,
             questions: [],
             answers: []
         };
@@ -25,9 +25,8 @@ class App extends  React.Component {
         };
 
         this.getQueryValues = () => {
-            console.log("get query value called!");
+            //console.log("get query value called!");
             return {
-                steps: this.initialSteps,
                 question: this.state.currentQuestion,
                 index: this.state.currentIndex
             }
@@ -36,13 +35,19 @@ class App extends  React.Component {
         this.initialSteps = [
               { 
                 id: '0',
-                message: 'Hi, you can ask me your tax questions!',
+                message: 'Hi, you can ask me your questions!',
                 trigger: '1'
               },
               {
                 id: '1',
                 user: true,
-                trigger: '2',
+                trigger:  () => {
+                    this.setState({
+                        currentIndex: 0
+                    });
+                    console.log("going to 2", this.state.currentIndex)
+                    return 2;
+                },
                 validator: (value) => {
                     console.log("Setting state.", value);
                     this.setState({
@@ -54,7 +59,16 @@ class App extends  React.Component {
               },
               {
                 id: '2',
-                message: 'Here is what I found.',
+                message:() => {
+                    var responses = [
+                        'Results. Incomming',
+                        'Got a few responses for you.',
+                        'Looks like this may answer it.',
+                        'How about this?'
+                    ];
+                    var randomnumber = Math.floor(Math.random() * responses.length);
+                    return responses[randomnumber];
+                },
                 trigger: '3',
               },
               {
@@ -64,14 +78,29 @@ class App extends  React.Component {
               },
               {
                 id: '4',
-                message: 'Was this answer helpful?',
+                message: () => {
+                    var responses = [
+                        'Was this answer helpful?',
+                        'Does this help with your question?',
+                        'Is this the answer? ',
+                        'Does this sound like the answer?'
+                    ];
+                    var randomnumber = Math.floor(Math.random() * responses.length);
+                    return responses[randomnumber];
+                },
                 trigger: '5'
               },
               {
                 id: '5',
                 options: [
                     { value: 1, label: 'Yes', trigger: '1' },
-                    { value: this.getQueryValues().index++ , label: 'No', trigger: '3' },
+                    { value: 2, label: 'No', trigger: () => {
+                        this.setState({
+                            currentIndex: this.state.currentIndex + 1
+                        });
+                        console.log("going to 3", this.state.currentIndex)
+                        return 3;
+                    } },
                 ]
               }
         ];
@@ -85,7 +114,7 @@ class App extends  React.Component {
                 <div className="page">
                     <h1 className="app-header">AskIntuit!</h1>
                     <p className="pageInfo">
-                        Ask Intuit questions related to tax and tax documents. 
+                        Ask Intuit questions!
                     </p>
                     <p className="pageInfo">
                         Get skills for alexa.
@@ -101,7 +130,8 @@ class App extends  React.Component {
                         <i className="devicon-python-plain-wordmark"></i>
                     </div>
                 </div>
-                    <ChatBot className="chatbot-ui" headerTitle="Lets talk!" steps={this.initialSteps} />
+                    <ChatBot className="chatbot-ui" headerTitle="Lets talk!" 
+                            steps={this.initialSteps}  />
             </div>
         );
     }

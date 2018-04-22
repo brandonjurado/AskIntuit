@@ -3,7 +3,7 @@ import requests
 import re
 from collections import OrderedDict
 
-search_term_string = "how do I file 401k"
+search_term_string = "how do I amend a tax return"
 page = requests.get(
   "https://accountants-community.intuit.com/search?filters%5Bcountry%5D=US&filters%5Bdocument_type%5D=Question&filters%5Bstate%5D=Recommended&q=" + search_term_string)
 soup = BeautifulSoup(page.content, 'html.parser')
@@ -33,6 +33,6 @@ for i in final_indexes:
           if (ans.string != None and ans.string.strip()):
               answer.append(ans.string)
       answer_array.append(' '.join(answer))
-print(question_array[0])
-print(answer_array[0])
+print(question_array)
+print(answer_array)
 
