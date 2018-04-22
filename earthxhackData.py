@@ -23,20 +23,18 @@ question_array = []
 #https://accountants-community.intuit.com/articles/1609578
 for i in final_indexes:
   rr = requests.get("https://accountants-community.intuit.com/articles/" + i)
-  result_data = rr.text
-  soup = BeautifulSoup(result_data, 'html.parser')
+  soup = BeautifulSoup(rr.content, 'html.parser')
   if "Solution Description" in str(soup) and "Question 1:" not in str(soup):
-    for row in soup.find_all('div',attrs={"class" : "article row"}):
-      start1 = 'modified'
-      start2 = 'Solution Description'
-      end1 = 'Solution'
-      end2 = 'Was this article helpful?'
-      s = row.text
-      questions = s[s.find(start1) + len(start1):s.rfind(end1)]
-      questions = questions.replace('\n', '')
-      answers = s[s.find(start2) + len(start2):s.rfind(end2)]
-      answers = answers.replace('\n', '')
-      question_array.append(questions)
-      answer_array.append(answers)
+      result = soup.find("div", class_="article-body salesforce")
+      question = list(result.children)[0].text
+      if (question == "Problem Description"):
+          text = list(result.children)[1:]
+          for i in text:
+              if (i.string != None and i.string.strip()):
+                  question = i.string
+                  break
+      question_array.append(question)
+      answer = result.text.replace('\n', ' ')
+      answer_array.append(answer)
 print(question_array)
 print(answer_array)
