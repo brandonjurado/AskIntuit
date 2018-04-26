@@ -1,0 +1,84 @@
+@font-face {
+    font-family: "Lato";
+    src: url("Lato-Regular.ttf") format("opentype"),
+}
+
+@font-face {
+    font-family: "GreatVibes";
+    src: url("GreatVibes-Regular.ttf") format("opentype"),
+}
+
+
+body{
+    margin:0;
+    padding: 0px;
+    height: 100%;
+    overflow: hidden;
+    background: #6e48aa;
+    font-family: 'Lato';
+    background: linear-gradient(to right, #8325c4, #ee6244);
+
+    .app-view{
+        top: 10%;
+        position: relative;
+        width: 1000px;
+        height: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        
+        .page {
+            z-index: -1;
+            height: 100%;
+            position: absolute;
+            width: 800px;
+            color: white;
+        }
+
+        .about-footer {
+            position: relative;
+            width: 400px;
+            height: 50px;
+            font-size: 4.3em;
+            display: inline-flex;
+            justify-content:  space-evenly;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.5);
+
+            img{
+                margin-right: 0.2em;
+            }
+        }
+
+        .pageInfo{
+             font-size: 1.4em;
+        }
+
+        .app-header {
+            font-size: 7em;
+            font-family: 'GreatVibes';
+            text-shadow: 0 1px 10px rgba(0,0,0,0.5);
+            text-decoration: underline;
+            margin-bottom: 4px;
+
+            p {
+                margin-top: 0px;
+                margin: 3px;
+            }
+        }
+
+        .chatbot-ui {
+            top: 2%;
+            margin-left: 700px;
+
+            div[class^="rsc-"]:not(.rsc-ts-bubble) {
+                border-radius: 0.02em;
+
+                input {
+                    border-radius: inherit;
+                    background: #2e2e2e !important;
+                }
+
+            }
+        }
+    }
+}
